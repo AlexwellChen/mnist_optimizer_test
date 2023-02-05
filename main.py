@@ -70,7 +70,7 @@ def main():
     
     prof = torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_fused_adan'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_fused_adam'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
