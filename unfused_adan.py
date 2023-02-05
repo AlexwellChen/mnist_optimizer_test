@@ -66,26 +66,27 @@ def main():
     # optimizer = LSAdam(cnn.parameters())
     optimizer = Adan(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
+    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA]) as prof:
+        for epoch in range(EPOCH):
+            start_time = time.time()
+            for step,(x,y) in enumerate(train_loader):
+                b_x = Variable(x).cuda()
+                b_y = Variable(y).cuda()
+                output = cnn(b_x)
+                loss = loss_func(output,b_y)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                prof.step()
+                if step % 50 == 0:
+                    test_output = cnn(test_x)
     
-    for epoch in range(EPOCH):
-        start_time = time.time()
-        for step,(x,y) in enumerate(train_loader):
-            b_x = Variable(x).cuda()
-            b_y = Variable(y).cuda()
-            output = cnn(b_x)
-            loss = loss_func(output,b_y)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            if step % 50 == 0:
-                test_output = cnn(test_x)
- 
-                # !!!!!!!! Change in here !!!!!!!!! #
-                pred_y = torch.max(test_output, 1)[1].cuda().data.squeeze()  # move the computation in GPU
- 
-                accuracy = torch.sum(pred_y == test_y).type(torch.FloatTensor) / test_y.size(0)
-                print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
-        end_time = time.time()
-        print("One Epoch cost ", end_time - start_time, " s.")
+                    # !!!!!!!! Change in here !!!!!!!!! #
+                    pred_y = torch.max(test_output, 1)[1].cuda().data.squeeze()  # move the computation in GPU
+    
+                    accuracy = torch.sum(pred_y == test_y).type(torch.FloatTensor) / test_y.size(0)
+                    print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
+            end_time = time.time()
+            print("One Epoch cost ", end_time - start_time, " s.")
 if __name__ == '__main__':
     main()
