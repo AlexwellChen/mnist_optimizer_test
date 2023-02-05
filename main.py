@@ -8,7 +8,7 @@ import torch.utils.data as Data
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
-from Adan import AdanOptimizer
+from adan_Opt import AdanOptimizer
 import time
  
 EPOCH = 1
