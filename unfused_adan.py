@@ -66,7 +66,13 @@ def main():
     # optimizer = LSAdam(cnn.parameters())
     optimizer = Adan(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
-    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA]) as prof:
+    with torch.profiler.profile(
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_unfused_adan'),
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=True
+    ) as prof:
         for epoch in range(EPOCH):
             start_time = time.time()
             for step,(x,y) in enumerate(train_loader):
