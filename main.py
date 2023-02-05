@@ -8,8 +8,8 @@ import torch.utils.data as Data
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
-# from adan_Opt import AdanOptimizer
-from LSAdam import LSAdam
+from adan_Opt import AdanOptimizer
+# from LSAdam import LSAdam
 import time
  
 EPOCH = 1
@@ -64,8 +64,8 @@ def main():
     cnn.cuda()
  
     # optimizer = optim.Adam(cnn.parameters(),lr=LR)
-    optimizer = LSAdam(cnn.parameters())
-    # optimizer = AdanOptimizer(cnn.parameters())
+    # optimizer = LSAdam(cnn.parameters())
+    optimizer = AdanOptimizer(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
     
     prof = torch.profiler.profile(
