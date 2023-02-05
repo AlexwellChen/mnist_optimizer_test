@@ -9,6 +9,7 @@ import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
 from adan_Opt import AdanOptimizer
+from LSAdam import LSAdam
 import time
  
 EPOCH = 1
@@ -63,37 +64,39 @@ def main():
     cnn.cuda()
  
     # optimizer = optim.Adam(cnn.parameters(),lr=LR)
-    # optimizer = LSAdam(cnn.parameters())
-    optimizer = AdanOptimizer(cnn.parameters())
+    optimizer = LSAdam(cnn.parameters())
+    # optimizer = AdanOptimizer(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
     
-    with torch.profiler.profile(
+    prof = torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_fused_adan'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
-    ) as prof:    
-        for epoch in range(EPOCH):
-            start_time = time.time()
-            for step,(x,y) in enumerate(train_loader):
-                b_x = Variable(x).cuda()
-                b_y = Variable(y).cuda()
-                output = cnn(b_x)
-                loss = loss_func(output,b_y)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                prof.step()
-                if step % 50 == 0:
-                    test_output = cnn(test_x)
+    )
+    prof.start()
+    for epoch in range(EPOCH):
+        start_time = time.time()
+        for step,(x,y) in enumerate(train_loader):
+            b_x = Variable(x).cuda()
+            b_y = Variable(y).cuda()
+            output = cnn(b_x)
+            loss = loss_func(output,b_y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            prof.step()
+            if step % 50 == 0:
+                test_output = cnn(test_x)
     
-                    # !!!!!!!! Change in here !!!!!!!!! #
-                    pred_y = torch.max(test_output, 1)[1].cuda().data.squeeze()  # move the computation in GPU
+                # !!!!!!!! Change in here !!!!!!!!! #
+                pred_y = torch.max(test_output, 1)[1].cuda().data.squeeze()  # move the computation in GPU
     
-                    accuracy = torch.sum(pred_y == test_y).type(torch.FloatTensor) / test_y.size(0)
-                    print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
-            end_time = time.time()
-            print("One Epoch cost ", end_time - start_time, " s.")
+                accuracy = torch.sum(pred_y == test_y).type(torch.FloatTensor) / test_y.size(0)
+                print('Epoch: ', epoch, '| train loss: %.4f' % loss.item(), '| test accuracy: %.2f' % accuracy)
+        end_time = time.time()
+        print("One Epoch cost ", end_time - start_time, " s.")
+    prof.stop()
 if __name__ == '__main__':
     main()

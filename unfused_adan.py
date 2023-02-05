@@ -8,7 +8,7 @@ import torch.utils.data as Data
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
-from adan import Adan
+# from adan import Adan
 import time
  
 EPOCH = 1
@@ -62,9 +62,9 @@ def main():
     cnn = CNN()
     cnn.cuda()
  
-    # optimizer = optim.Adam(cnn.parameters(),lr=LR)
+    optimizer = optim.Adam(cnn.parameters())
     # optimizer = LSAdam(cnn.parameters())
-    optimizer = Adan(cnn.parameters())
+    # optimizer = Adan(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
     with torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
