@@ -1,13 +1,11 @@
 import math
-from typing import List
 import torch
-from torch import Tensor
 from torch.optim.optimizer import Optimizer
 import fused_adan
 fused_adan_cuda = None
 
 
-class Adan(Optimizer):
+class AdanOptimizer(Optimizer):
     """
     Implements a pytorch variant of Adan
     Adan was proposed in
@@ -59,6 +57,7 @@ class Adan(Optimizer):
 
         if fused_adan_cuda is None:
             fused_adan_cuda = fused_adan
+            
         defaults = dict(lr=lr,
                         betas=betas,
                         eps=eps,
@@ -216,3 +215,4 @@ class Adan(Optimizer):
                 state["pre_grad"] = grad_copy
                 
         return loss
+
