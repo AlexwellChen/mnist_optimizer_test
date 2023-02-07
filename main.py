@@ -65,12 +65,12 @@ def main():
  
     # optimizer = optim.Adam(cnn.parameters(),lr=LR)
     # optimizer = LSAdam(cnn.parameters())
-    optimizer = Adan(cnn.parameters())
+    optimizer = Adan(cnn.parameters(), foreach=False, fused=True)
     loss_func = nn.CrossEntropyLoss()
     
     prof = torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_fused_adam'),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/CNN_fused_adan_single_tensor'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
