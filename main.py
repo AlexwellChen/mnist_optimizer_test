@@ -8,7 +8,7 @@ import torch.utils.data as Data
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
-from adan import AdanOptimizer
+from adan import Adan
 # from LSAdam import LSAdam
 import time
  
@@ -65,7 +65,7 @@ def main():
  
     # optimizer = optim.Adam(cnn.parameters(),lr=LR)
     # optimizer = LSAdam(cnn.parameters())
-    optimizer = AdanOptimizer(cnn.parameters())
+    optimizer = Adan(cnn.parameters())
     loss_func = nn.CrossEntropyLoss()
     
     prof = torch.profiler.profile(
